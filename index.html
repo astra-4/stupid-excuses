@@ -159,12 +159,40 @@
                 "My dog ate my homework.",
                 "My pencil went on strike.",
                 "The monster under my bed stole my calculator.",
-                "My computer is leaving me on seen."
-                "I left it in a library book."
+                "My computer is leaving me on seen.",
+                "I left it in a library book.",
+                "I finished the assignment but my computer forced an update.",
+                "My printer ran out of ink.",
+                "My algebra homework has letters in it for some reason.",
+                "I forgot to save the file.",
+                "My dog was sitting on my keyboard.",
+                "My cloud forgot to save the file.",
+                "My dog ate my USB drive.",
+                "I accidentally did last week's homework.",
+                "Autocorrect replaced all my work."
             ]
         };
 
-        
+        var currentCategory = "work";
+        var excuseBox = document.getElementById("excuseBox");
+        var generateBtn = document.getElementById("generateBtn");
+        var categoryButtons = document.querySelectorAll(".category-btn");
+
+        for (var i=0; i < categoryButtons.length; i++) {
+            categoryButtons[i].addEventListener("click", function () {
+                for (var j = 0; j < categoryButtons.length; j++) {
+                    categoryButtons[j].classList.remove("active");
+                }
+                this.classList.add("active");
+                currentCategory = this.getAttribute("data-category");
+            });
+        }
+
+        generateBtn.addEventListener("click", function() {
+            var list = excuses[currentCategory];
+            var randomIndex = Math.floor(Math.random() * list.length);
+            excuseBox.textContent = list[randomIndex];
+        });
     </script>
 </body>
 </html>
