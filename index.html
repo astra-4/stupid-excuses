@@ -1,1 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ridiculous Excuse Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    @keyframes flashBg {
+      0%   { background: #ff005d; }
+      20%  { background: #00f0ff; }
+      40%  { background: #ffee00; }
+      60%  { background: #9d00ff; }
+      80%  { background: #00ff85; }
+      100% { background: #ff005d; }
+    }
+
+    @keyframes flashCard {
+      0%   { background: #00f0ff; }
+      25%  { background: #ffee00; }
+      50%  { background: #ff005d; }
+      75%  { background: #00ff85; }
+      100% { background: #9d00ff; }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    @keyframes wobble {
+      0%   { transform: rotate(-2deg); }
+      50%  { transform: rotate(3deg); }
+      100% { transform: rotate(-2deg); }
+    }
+
+    @keyframes rainbowText {
+      0%   { color: #ff005d; }
+      25%  { color: #00f0ff; }
+      50%  { color: #ffee00; }
+      75%  { color: #00ff85; }
+      100% { color: #ff005d; }
+    }
+
+    @keyframes shake {
+      0%   { transform: translate(-50%, -50%) rotate(0deg); }
+      25%  { transform: translate(-54%, -46%) rotate(-6deg); }
+      50%  { transform: translate(-46%, -54%) rotate(6deg); }
+      75%  { transform: translate(-52%, -48%) rotate(-4deg); }
+      100% { transform: translate(-50%, -50%) rotate(0deg); }
+    }
+
+    @keyframes boxShake {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(-6px, 4px); }
+      50%  { transform: translate(6px, -4px); }
+      75%  { transform: translate(-4px, -6px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    @keyframes scrollLeft {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(-100%); }
+    }
+
+    body {
+      font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+      animation: flashBg 0.5s infinite;
+    }
+
+    body.calm {
+      animation: flashBg 0.5s infinite;
+    }
+
+    .marquee {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #000000;
+      color: #ffee00;
+      font-size: 22px;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      z-index: 5;
+    }
+
+    .marquee span {
+      display: inline-block;
+      padding: 6px 0;
+      animation: scrollLeft 7s linear infinite;
+    }
+
+    .corner-img {
+      position: fixed;
+      width: 90px;
+      height: 90px;
+      background: #cccccc;
+      border: 3px solid #000000;
+      animation: spin 1.3s linear infinite;
+      z-index: 0;
+      font-size: 11px;
+      color: #444444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .corner-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .corner-img.tl { top: 40px; left: 8px; }
+    .corner-img.tr { top: 40px; right: 8px; animation-direction: reverse; }
+    .corner-img.bl { bottom: 8px; left: 8px; animation-direction: reverse; }
+    .corner-img.br { bottom: 8px; right: 8px; }
+
+    .card {
+      position: relative;
+      z-index: 2;
+      background: #2a1a52;
+      border: 5px solid #000000;
+      border-radius: 0;
+      padding: 30px;
+      max-width: 540px;
+      width: 100%;
+      text-align: center;
+      animation: flashCard 0.5s infinite, wobble 1.4s ease-in-out infinite;
+    }
+
+    h1 {
+      font-size: 40px;
+      margin-bottom: 6px;
+      animation: rainbowText 0.8s linear infinite;
+      text-shadow: 2px 2px 0 #000000;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #000000;
+      margin-bottom: 22px;
+      font-weight: bold;
+    }
+
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+
+    .category-btn {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: bold;
+      padding: 9px 16px;
+      border: 3px solid #000000;
+      background: #1b1033;
+      color: #ffffff;
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .category-btn:hover {
+      background: #00f0ff;
+      color: #000000;
+    }
+
+    .category-btn.active {
+      background: #ff005d;
+      color: #ffffff;
+    }
+
+    .excuse-box {
+      background: #000000;
+      border: 4px solid #ffee00;
+      border-radius: 0;
+      padding: 26px 18px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      line-height: 1.3;
+      margin-bottom: 20px;
+      color: #ffee00;
+    }
+
+    .excuse-box.pop {
+      animation: boxShake 0.4s ease;
+    }
+
+    .counter {
+      font-size: 14px;
+      color: #000000;
+      margin-bottom: 18px;
+      font-weight: bold;
+    }
+
+    .generate-btn {
+      font-family: inherit;
+      font-size: 24px;
+      font-weight: bold;
+      padding: 16px 36px;
+      border: 4px solid #000000;
+      background: #00ff85;
+      color: #000000;
+      border-radius: 0;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .generate-btn:hover {
+      background: #ffee00;
+    }
+
+    .generate-btn:active {
+      transform: translate(2px, 2px);
+    }
+
+    .panic-btn {
+      font-family: inherit;
+      font-size: 13px;
+      margin-top: 14px;
+      padding: 6px 14px;
+      border: 2px solid #000000;
+      background: #ffffff;
+      color: #000000;
+      border-radius: 0;
+      cursor: pointer;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .big-img {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 420px;
+      height: 420px;
+      max-width: 80vw;
+      max-height: 80vh;
+      background: #dddddd;
+      border: 6px solid #000000;
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #333333;
+      font-size: 18px;
+      overflow: hidden;
+    }
+
+    .big-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .big-img.show {
+      display: flex;
+      animation: shake 0.25s linear infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="marquee"><span>🔥🔥 THE MOST RIDICULOUS EXCUSES ON THE INTERNET 🔥🔥 TRUST ME BRO 🔥🔥 YOU HAVE BEEN WARNED 🔥🔥 AHHAHAHHHAHA</span></div>
+
+  <div class="corner-img tl"><a href="https://media.tenor.com/3SHajRoXGRUAAAAe/explosion-cats.png"></div>
+  <div class="corner-img tl"><a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5yL2DEKRhdEMo995VttnYRAzXf4XjjIcp5selWOaQtg&s"></div>
+  <div class="corner-img tl"><a href="https://media.tenor.com/SGnCM5tny-gAAAAe/an-iq-too-high.png"></div>
+  <div class="corner-img tl"><a href="https://media.tenor.com/ZlZZTd366EYAAAAe/we-have-no-sappers-dog-accepting-fate.png"></div>
+
+  <div class="card">
+    <h1>Ridiculous Excuse Generator</h1>
+    <p class="subtitle">PICK A REASON AND sMaSh THAT LIKE BUTTON AND SUBSVRIBEEEEE</p>
+
+    <div class="categories">
+      <button class="category-btn active" data-category="work">Work</button>
+      <button class="category-btn" data-category="school">School</button>
+      <button class="category-btn" data-category="homework">Homework</button>
+    </div>
+
+    <div class="excuse-box" id="excuseBox">Your excuse will appear here...</div>
+
+    <p class="counter" id="counter">Excuses generated: 0</p>
+
+    <button class="generate-btn" id="generateBtn">Generate Excuse</button>
+
+    <button class="panic-btn" id="panicBtn">my eyes hurt (calm mode)</button>
+  </div>
+
+  <div class="big-img" id="bigImg"><a href="https://media.tenor.com/w0dZ4Eltk7IAAAAe/vuknok.png"></div>
+
+  <script>
+    var excuses = {
+      work: [
+          "My alarm clock joined a union and went on strike this morning.",
+          "A family of raccoons has occupied my car and refuses to negotiate.",
+          "I accidentally superglued myself to my office chair at home.",
+          "My Wi-Fi router needs emotional support and I can't leave its side.",
+          "I'm stuck in a staring contest with my cat and I refuse to lose.",
+          "My houseplant is sick and I'm the only one it trusts.",
+          "A squirrel stole my car keys.",
+          "The stop sign told me to stop.",
+          "My vacuum cleaner ate my sock.",
+          "There was a family of ants crossing the road."
+      ],
+        school: [
+            "My dog ate my shoes.",
+            "I was abducted by my cat.",
+            "My little brother ate my backpack.",
+            "My brother hid my backpack inside the dishwasher",
+            "There was a family of ants crossing the road.",
+            "I spent an hour looking for my glasses before realizing they had been on my face the entire time.",
+            "I accidentlaly got on the wrong bus.",
+            "My little sibling ate all my school supplies.",
+            "The stop sign told me to stop.",
+            "I realized that I was wearing two different shoes, noticed halfway there, and got a mid-life crisis.",
+            "A squirrel stole my lunch."
+        ],
+        homework: [
+            "My printer ate the assignment.",
+            "A seagull stole my homework.",
+            "My dog ate my homework.",
+            "My pencil went on strike.",
+            "The monster under my bed stole my calculator.",
+            "My computer is leaving me on seen.",
+            "I left it in a library book.",
+            "I finished the assignment but my computer forced an update.",
+            "My printer ran out of ink.",
+            "My algebra homework has letters in it for some reason.",
+            "I forgot to save the file.",
+            "My dog was sitting on my keyboard.",
+            "My cloud forgot to save the file.",
+            "My dog ate my USB drive.",
+            "I accidentally did last week's homework.",
+            "Autocorrect replaced all my work."
+        ]
+      };
+
+    var currentCategory = "work";
+    var count = 0;
+    var excuseBox = document.getElementById("excuseBox");
+    var generateBtn = document.getElementById("generateBtn");
+    var panicBtn = document.getElementById("panicBtn");
+    var counter = document.getElementById("counter");
+    var bigImg = document.getElementById("bigImg");
+    var categoryButtons = document.querySelectorAll(".category-btn");
+
+    for (var i = 0; i < categoryButtons.length; i++) {
+      categoryButtons[i].addEventListener("click", function () {
+        for (var j = 0; j < categoryButtons.length; j++) {
+          categoryButtons[j].classList.remove("active");
+        }
+        this.classList.add("active");
+        currentCategory = this.getAttribute("data-category");
+      });
+    }
+
+    generateBtn.addEventListener("click", function () {
+      var list = excuses[currentCategory];
+      var randomIndex = Math.floor(Math.random() * list.length);
+      excuseBox.textContent = list[randomIndex];
+      excuseBox.classList.remove("pop");
+      void excuseBox.offsetWidth;
+      excuseBox.classList.add("pop");
+      count = count + 1;
+      coutner.textContent = "Excuses generated: " + count;
+      bigImg.classList.add("show");
+      setTimeout(function () {
+        bigImg.class.list.remove("show");
+      }, 1000);
+    });
+
+    panicBtn.addEventListener("click", funciton () {
+      panicBtn.textContent = "womp womp. cope.";
+    });
+  </script>
+</body>
+</html>
